@@ -283,3 +283,11 @@ def prepare_multi_task_data(data_dir, in_vocab_size, out_vocab_size):
             (in_seq_dev_ids_path, out_seq_dev_ids_path, label_dev_ids_path),
             (in_seq_test_ids_path, out_seq_test_ids_path, label_test_ids_path),
             (in_vocab_path, out_vocab_path, label_path)]
+
+
+def prepare_one_data(data_dir, in_vocab_size, sentence):
+    in_vocab_path = os.path.join(data_dir, "in_vocab_%d.txt" % in_vocab_size)
+    vocab, _ = initialize_vocab(in_vocab_path)
+    UNK_ID = UNK_ID_dict['with_padding']
+    token_ids = sentence_to_token_ids(sentence, vocab, UNK_ID, naive_tokenizer, True)
+    return token_ids

@@ -37,8 +37,8 @@ tf.app.flags.DEFINE_integer("word_embedding_size", 128, "word embedding size")
 tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
 tf.app.flags.DEFINE_integer("in_vocab_size", 10000, "max vocab Size.")
 tf.app.flags.DEFINE_integer("out_vocab_size", 10000, "max tag vocab Size.")
-tf.app.flags.DEFINE_string("data_dir", "/tmp", "Data directory")
-tf.app.flags.DEFINE_string("train_dir", "/tmp", "Training directory.")
+tf.app.flags.DEFINE_string("data_dir", "data/ATIS", "Data directory")
+tf.app.flags.DEFINE_string("train_dir", "./model_dir", "Training directory.")
 tf.app.flags.DEFINE_integer("max_train_data_size", 0,
                             "Limit on the size of training data (0: no limit)")
 tf.app.flags.DEFINE_integer("steps_per_checkpoint", 100,
@@ -49,13 +49,13 @@ tf.app.flags.DEFINE_integer("max_test_data_size", 0,
                             "Max size of test set.")
 tf.app.flags.DEFINE_boolean("use_attention", True,
                             "Use attention based RNN")
-tf.app.flags.DEFINE_integer("max_sequence_length", 0,
+tf.app.flags.DEFINE_integer("max_sequence_length", 50,
                             "Max sequence length.")
 tf.app.flags.DEFINE_float("dropout_keep_prob", 0.5,
                           "dropout keep cell input and output prob.")  
 tf.app.flags.DEFINE_boolean("bidirectional_rnn", True,
                             "Use birectional RNN")
-tf.app.flags.DEFINE_string("task", None, "Options: joint; intent; tagging")
+tf.app.flags.DEFINE_string("task", "joint"  , "Options: joint; intent; tagging")
 FLAGS = tf.app.flags.FLAGS
     
 if FLAGS.max_sequence_length == 0:
@@ -216,9 +216,10 @@ def create_model(session,
           task=task)
 
   ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
-  if ckpt and tf.gfile.Exists(ckpt.model_checkpoint_path):
+  print(ckpt)
+  if ckpt and ckpt.model_checkpoint_path:
     print("Reading model parameters from %s" % ckpt.model_checkpoint_path)
-    model_train.saver.restore(session, ckpt.model_checkpoint_path)
+    model_train.saver.restore(session, "./model_dir/model.ckpt-30000")
   else:
     print("Created model with fresh parameters.")
     session.run(tf.global_variables_initializer())
@@ -286,7 +287,7 @@ def train():
 
     best_valid_score = 0
     best_test_score = 0
-    while model.global_step.eval() < FLAGS.max_training_steps:
+    while model.global_step.eval() < FLAGS.max_training_steps or True:
       random_number_01 = np.random.random_sample()
       bucket_id = min([i for i in xrange(len(train_buckets_scale))
                        if train_buckets_scale[i] > random_number_01])
