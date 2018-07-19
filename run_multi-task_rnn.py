@@ -227,7 +227,7 @@ def create_model(session,
         
 def train():
   print ('Applying Parameters:')
-  for k,v in FLAGS.__dict__['__flags'].iteritems():
+  for k,v in FLAGS.flag_values_dict().iteritems():
     print ('%s: %s' % (k, str(v)))
   print("Preparing data in %s" % FLAGS.data_dir)
   vocab_path = ''
